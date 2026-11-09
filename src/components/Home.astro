@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Configurador from './Configurador.astro';
+import Diari from './Diari.astro';
+import Galeria from './Galeria.astro';
+import Serveis from './Serveis.astro';
+import Contacte from './Contacte.astro';
+import Footer from './Footer.astro';
+import MobileBar from './MobileBar.astro';
+import { ui, tr, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<Base lang={lang} title={tr(lang, ui.meta.title)} description={tr(lang, ui.meta.description)} schema>
+  <Header lang={lang} />
+  <main id="contingut">
+    <Hero lang={lang} />
+    <Serveis lang={lang} />
+    <Diari lang={lang} />
+    <Galeria lang={lang} />
+    <Configurador lang={lang} />
+    <Contacte lang={lang} />
+  </main>
+  <Footer lang={lang} />
+  <MobileBar lang={lang} />
+</Base>

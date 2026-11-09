@@ -1,0 +1,41 @@
+---
+import { business, telUrl } from '../data/business';
+import { p, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Carrer Rosselló 128 ${business.city}`)}`;
+---
+<section id="contacte" aria-labelledby="contacte-t">
+  <div class="mx-auto grid max-w-[90rem] items-center gap-14 px-4 py-20 sm:px-8 sm:py-24 lg:grid-cols-12">
+    <!-- Cantonada: les dues plaques de carrer -->
+    <div class="relative mx-auto h-72 w-full max-w-md lg:col-span-5" aria-hidden="true" data-reveal>
+      <div class="absolute left-1/2 top-6 h-[calc(100%-1.5rem)] w-px bg-ratlla"></div>
+      <div class="placa-carrer absolute left-[6%] top-10 px-6 py-4 text-center">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em]">Carrer de</p>
+        <p class="rotul text-4xl">Rosselló</p>
+      </div>
+      <div class="placa-carrer absolute right-[4%] top-40 px-6 py-4 text-center">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em]">Carrer de</p>
+        <p class="rotul text-4xl">Benviure</p>
+      </div>
+      <div class="placa absolute left-[38%] top-[7.5rem] grid h-16 w-20 place-items-center"><span class="rotul text-3xl">128</span></div>
+    </div>
+
+    <div class="lg:col-span-6 lg:col-start-7">
+      <h2 id="contacte-t" class="rotul text-[clamp(2.5rem,5vw,4rem)]" data-reveal>{p(lang, 'On som', 'Dónde estamos')}</h2>
+      <p class="mt-4 text-lg text-tinta-2" data-reveal style="--i:1">
+        {p(lang, 'Carrer de Rosselló, 128, a la cantonada amb el carrer de Benviure (Edifici Clariana).', 'Calle Rosselló, 128, en la esquina con la calle Benviure (Edificio Clariana).')}<br />
+        {business.postalCode} Sant Boi de Llobregat · <a href={maps} rel="noopener" target="_blank" class="font-semibold text-esmalt underline underline-offset-4">{p(lang, 'Obrir al mapa', 'Abrir en el mapa')}</a>
+      </p>
+      <dl class="mt-10 grid gap-8 border-t-2 border-tinta pt-8 sm:grid-cols-2" data-reveal style="--i:2">
+        <div><dt class="font-mono text-xs uppercase tracking-wider text-tinta-2">{p(lang, 'Telèfons', 'Teléfonos')}</dt><dd class="mt-2 grid gap-1">{business.phones.map((ph) => <a href={telUrl(ph.e164)} class="rotul text-4xl tabular-nums text-esmalt hover:underline">{ph.display}</a>)}</dd></div>
+        <div>
+          <dt class="font-mono text-xs uppercase tracking-wider text-tinta-2">{p(lang, 'Horari', 'Horario')}</dt>
+          <dd class="mt-2">{p(lang, 'De dilluns a divendres', 'De lunes a viernes')}<br /><span class="tabular-nums">9:00–13:00 · 17:00–20:00</span></dd>
+          <dt class="mt-5 font-mono text-xs uppercase tracking-wider text-tinta-2">Email</dt>
+          <dd class="mt-1"><a href={`mailto:${business.email}`} class="hover:underline">{business.email}</a></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>

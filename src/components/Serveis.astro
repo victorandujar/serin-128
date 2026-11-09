@@ -1,0 +1,26 @@
+---
+import { serveis } from '../data/serveis';
+import { p, tr, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section id="serveis" aria-labelledby="serveis-t" class="border-t border-ratlla bg-paper-2">
+  <div class="mx-auto max-w-[90rem] px-4 py-20 sm:px-8 sm:py-24">
+    <div class="grid gap-6 lg:grid-cols-12">
+      <h2 id="serveis-t" class="rotul text-[clamp(2.5rem,5vw,4rem)] lg:col-span-5" data-reveal>{p(lang, 'Què fem', 'Qué hacemos')}</h2>
+      <p class="text-lg text-tinta-2 lg:col-span-6 lg:col-start-7 lg:pt-3" data-reveal style="--i:1">{p(lang,
+        'Treballem sobretot a Sant Boi i al Baix Llobregat: Sant Feliu, Viladecans, Castelldefels, Cornellà i l’Hospitalet.',
+        'Trabajamos sobre todo en Sant Boi y el Baix Llobregat: Sant Feliu, Viladecans, Castelldefels, Cornellà y L’Hospitalet.')}</p>
+    </div>
+    <div class="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+      {serveis.map((s, i) => (
+        <div data-reveal style={`--i:${i}`}>
+          <h3 class="placa inline-flex min-w-[9rem] items-center justify-center px-5 py-3"><span class="rotul text-2xl">{tr(lang, s.title)}</span></h3>
+          <ul class="mt-5 divide-y divide-ratlla border-y border-ratlla">
+            {s.items.map((it) => <li class="py-2.5">{tr(lang, it)}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
