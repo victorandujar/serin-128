@@ -1,0 +1,21 @@
+---
+import { business } from '../data/business';
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': new URL('/#negoci', Astro.site).href,
+  name: business.fullName,
+  url: Astro.site?.href,
+  image: new URL('/og.png', Astro.site).href,
+  telephone: business.phones[0].e164,
+  email: business.email,
+  address: { '@type': 'PostalAddress', streetAddress: 'Carrer Rosselló, 128', postalCode: business.postalCode, addressLocality: business.city, addressRegion: business.region, addressCountry: 'ES' },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '13:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '17:00', closes: '20:00' },
+  ],
+  areaServed: business.areaServed.map((name) => ({ '@type': 'City', name })),
+  numberOfEmployees: { '@type': 'QuantitativeValue', value: business.teamSize },
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
