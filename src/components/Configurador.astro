@@ -1,0 +1,85 @@
+---
+import { categories } from '../data/configurador';
+import { business } from '../data/business';
+import { p, tr, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const box = 'grid h-5 w-5 shrink-0 place-items-center border-2 border-tinta bg-white text-[0.8rem] font-bold leading-none text-transparent peer-checked:text-esmalt';
+---
+<section id="pressupost" aria-labelledby="pressupost-t" class="overflow-hidden border-y border-ratlla bg-paper-2">
+  <div class="mx-auto grid max-w-[90rem] gap-12 px-4 py-20 sm:px-8 sm:py-24 lg:grid-cols-12">
+    <div class="lg:col-span-4">
+      <h2 id="pressupost-t" class="rotul text-[clamp(2.5rem,5vw,4rem)]" data-reveal>{p(lang, 'Demana pressupost', 'Pide presupuesto')}</h2>
+      <p class="mt-5 text-lg text-tinta-2" data-reveal style="--i:1">{p(lang,
+        'Omple el full i prem el botó: s’obrirà el WhatsApp amb el missatge escrit. Si ho prefereixes, truca o passa per la botiga.',
+        'Rellena la hoja y pulsa el botón: se abrirá WhatsApp con el mensaje escrito. Si lo prefieres, llama o pasa por la tienda.')}</p>
+      <p class="mt-6 text-tinta-2" data-reveal style="--i:2">{p(lang, 'Telèfons', 'Teléfonos')}: <a href={`tel:${business.phones[0].e164}`} class="font-semibold text-tinta">{business.phones[0].display}</a> · <a href={`tel:${business.phones[1].e164}`} class="font-semibold text-tinta">{business.phones[1].display}</a></p>
+    </div>
+
+    <form class="relative lg:col-span-7 lg:col-start-6" data-conf novalidate data-lang={lang} data-reveal style="--i:1">
+      <!-- Full d'encàrrec -->
+      <div class="paper-pautat rotate-[-0.6deg] rounded-sm border border-ratlla px-6 pb-8 pt-6 shadow-[0_2px_0_#e3dccd,0_30px_50px_-30px_rgb(0_0_0/0.35)] sm:px-10">
+        <header class="flex flex-wrap items-baseline justify-between gap-3 border-b-2 border-tinta pb-3">
+          <p class="rotul text-2xl text-logo">SERIN</p>
+          <p class="font-mono text-sm uppercase tracking-wider text-tinta-2">{p(lang, "Full d'encàrrec", 'Hoja de encargo')}</p>
+          <p class="font-mono text-sm text-tinta-2">{p(lang, 'Data', 'Fecha')}: <span data-avui>__/__/____</span></p>
+        </header>
+
+        <fieldset class="mt-6">
+          <legend class="font-mono text-xs uppercase tracking-wider text-tinta-2">{p(lang, 'Obra', 'Obra')}</legend>
+          <div class="mt-2 flex flex-wrap gap-x-8 gap-y-2">
+            {categories.map((c, i) => (
+              <label class="flex cursor-pointer items-center gap-2 text-lg">
+                <input type="radio" name="cat" value={c.id} data-cat-label={tr(lang, c.label)} class="peer sr-only" checked={i === 0} />
+                <span class={`${box} rounded-full peer-focus-visible:outline peer-focus-visible:outline-3 peer-focus-visible:outline-data`} aria-hidden="true">●</span>
+                <span class="font-semibold">{tr(lang, c.label)}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="mt-6">
+          <legend class="font-mono text-xs uppercase tracking-wider text-tinta-2">{p(lang, 'Feina', 'Trabajo')}</legend>
+          {categories.map((c, i) => (
+            <div class="mt-2 grid gap-x-8 sm:grid-cols-2" data-group={c.id} hidden={i !== 0}>
+              {c.opcions.map((o) => (
+                <label class="flex min-h-[2.4rem] cursor-pointer items-center gap-3 text-lg">
+                  <input type="checkbox" name="opc" value={tr(lang, o.label)} data-opt={`${c.id}-${o.id}`} class="peer sr-only" />
+                  <span class={`${box} rounded-[3px] peer-focus-visible:outline peer-focus-visible:outline-3 peer-focus-visible:outline-data`} aria-hidden="true">✓</span>
+                  <span>{tr(lang, o.label)}</span>
+                </label>
+              ))}
+            </div>
+          ))}
+          <p class="mt-1 min-h-5 text-sm font-semibold text-[#b3261e]" data-err-opc aria-live="polite"></p>
+        </fieldset>
+
+        <div class="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
+          <div>
+            <label for={`nom-${lang}`} class="font-mono text-xs uppercase tracking-wider text-tinta-2">{p(lang, 'Nom', 'Nombre')}</label>
+            <input id={`nom-${lang}`} name="nom" autocomplete="given-name" maxlength="60" class="mt-1 w-full border-0 border-b-2 border-tinta bg-transparent px-0 py-2 text-lg focus:border-esmalt focus:outline-none focus:ring-0 aria-[invalid=true]:border-[#b3261e]" aria-describedby={`err-nom-${lang}`} />
+            <p id={`err-nom-${lang}`} class="mt-1 min-h-5 text-sm font-semibold text-[#b3261e]" aria-live="polite"></p>
+          </div>
+          <div>
+            <label for={`mun-${lang}`} class="font-mono text-xs uppercase tracking-wider text-tinta-2">{p(lang, 'Població', 'Población')}</label>
+            <input id={`mun-${lang}`} name="municipi" autocomplete="address-level2" maxlength="60" class="mt-1 w-full border-0 border-b-2 border-tinta bg-transparent px-0 py-2 text-lg focus:border-esmalt focus:outline-none focus:ring-0" />
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
+          <p class="max-w-xs text-sm text-tinta-2">{p(lang, 'Aquesta web no guarda cap dada: el missatge l’envies tu des del teu WhatsApp.', 'Esta web no guarda ningún dato: el mensaje lo envías tú desde tu WhatsApp.')}</p>
+          <button type="submit" class="btn btn-esmalt">{p(lang, 'Enviar per WhatsApp', 'Enviar por WhatsApp')}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import { initConfigurador } from '../scripts/configurador';
+  document.querySelectorAll<HTMLFormElement>('[data-conf]').forEach((f) => {
+    initConfigurador(f);
+    const d = f.querySelector('[data-avui]');
+    if (d) d.textContent = new Date().toLocaleDateString(f.dataset.lang === 'es' ? 'es-ES' : 'ca-ES');
+  });
+</script>

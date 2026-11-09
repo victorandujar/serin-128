@@ -1,0 +1,84 @@
+---
+import { Image } from 'astro:assets';
+import { fites } from '../data/diari';
+import { p, tr, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const last = fites[fites.length - 1]!.day;
+const stamp = (d: string): string => { const [y, m, dd] = d.split('-'); return `'${y!.slice(2)} ${Number(m)} ${Number(dd)}`; };
+const fmt = (d: string): string => new Date(d).toLocaleDateString(lang === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'long' });
+const dia = p(lang, 'Dia', 'Día');
+---
+<section id="diari" aria-labelledby="diari-t" class="bg-tinta text-paper">
+  <div class="mx-auto max-w-[90rem] px-4 py-20 sm:px-8 sm:py-24">
+    <div class="grid gap-6 lg:grid-cols-12">
+      <h2 id="diari-t" class="rotul text-[clamp(2.5rem,5vw,4rem)] lg:col-span-5" data-reveal>{p(lang, "Diari d'una obra", 'Diario de una obra')}</h2>
+      <p class="text-lg text-paper/75 lg:col-span-6 lg:col-start-7 lg:pt-3" data-reveal style="--i:1">{p(lang,
+        'Un bany, entre el febrer i l’abril de 2014. Són les fotos que vam anar fent amb el mòbil: abans de començar, durant l’enrajolat i el dia que el vam acabar.',
+        'Un baño, entre febrero y abril de 2014. Son las fotos que fuimos haciendo con el móvil: antes de empezar, durante el alicatado y el día que lo terminamos.')}</p>
+    </div>
+
+    <!-- Full de contactes -->
+    <ol class="mt-12 flex h-[22rem] gap-2 rounded-lg bg-black p-2 sm:h-[30rem] sm:gap-3 sm:p-3" data-strip data-reveal style="--i:2">
+      {fites.map((f, i) => (
+        <li class="group relative min-w-0 flex-[1] cursor-pointer overflow-hidden rounded-sm transition-[flex-grow] duration-700 ease-[cubic-bezier(.6,0,.2,1)] data-[active]:flex-[4]" data-frame={i} data-day={f.day} data-date={fmt(f.date)} data-label={tr(lang, f.label)} data-active={i === 0 ? '' : undefined}>
+          <Image src={f.img} alt={tr(lang, f.alt)} widths={[360, 600]} sizes="(min-width: 1024px) 50vw, 80vw" class="absolute inset-0 h-full w-full object-cover brightness-[.55] grayscale transition duration-500 group-data-[active]:brightness-100 group-data-[active]:grayscale-0" loading="lazy" />
+          <span class="estampa absolute bottom-2 right-3 text-sm sm:text-base" aria-hidden="true">{stamp(f.date)}</span>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-8 grid items-center gap-6 lg:grid-cols-12" data-reveal style="--i:3">
+      <div class="lg:col-span-4" aria-live="polite">
+        <p class="rotul text-4xl sm:text-5xl"><span data-dia>{dia} 1</span></p>
+        <p class="mt-1 text-paper/75"><span data-fita class="font-semibold text-paper">{tr(lang, fites[0]!.label)}</span> · <span data-data>{fmt(fites[0]!.date)}</span></p>
+      </div>
+      <div class="relative mx-3 h-12 lg:col-span-8">
+        <div class="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-paper/20" aria-hidden="true"></div>
+        <div class="absolute left-0 top-1/2 h-1 -translate-y-1/2 bg-data" style="width: var(--p, 0%)" data-progress aria-hidden="true"></div>
+        {fites.map((f, i) => (
+          <button type="button" data-fita-btn={i} class="absolute top-1/2 z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 place-items-center" style={`left:${((f.day - 1) / (last - 1)) * 100}%`} aria-label={`${dia} ${f.day}: ${tr(lang, f.label)}`}>
+            <span class="block h-4 w-4 rotate-45 border-2 border-paper bg-tinta transition-colors" data-dot></span>
+          </button>
+        ))}
+        <label class="sr-only" for={`diari-range-${lang}`}>{p(lang, "Dia de l'obra", 'Día de la obra')}</label>
+        <input id={`diari-range-${lang}`} type="range" min="1" max={last} value="1" step="1" class="absolute inset-x-0 top-0 h-full w-full cursor-ew-resize opacity-0" data-range />
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  for (const section of document.querySelectorAll<HTMLElement>('#diari')) {
+    const range = section.querySelector<HTMLInputElement>('[data-range]');
+    const frames = [...section.querySelectorAll<HTMLElement>('[data-frame]')];
+    const btns = [...section.querySelectorAll<HTMLButtonElement>('[data-fita-btn]')];
+    const diaEl = section.querySelector<HTMLElement>('[data-dia]');
+    const dataEl = section.querySelector<HTMLElement>('[data-data]');
+    const fitaEl = section.querySelector<HTMLElement>('[data-fita]');
+    const prog = section.querySelector<HTMLElement>('[data-progress]');
+    if (!range) continue;
+    const max = Number(range.max);
+    const word = diaEl?.textContent?.split(' ')[0] ?? 'Dia';
+    let shown = -1;
+    const render = (day: number): void => {
+      let idx = 0;
+      frames.forEach((f, i) => { if (Number(f.dataset.day) <= day) idx = i; });
+      prog?.style.setProperty('--p', `${((day - 1) / (max - 1)) * 100}%`);
+      if (diaEl) diaEl.textContent = `${word} ${day}`;
+      range.value = String(day);
+      range.setAttribute('aria-valuetext', `${word} ${day}: ${frames[idx]?.dataset.label ?? ''}`);
+      btns.forEach((b, i) => b.querySelector('[data-dot]')?.classList.toggle('bg-data', i <= idx));
+      if (idx === shown) return;
+      shown = idx;
+      frames.forEach((f, i) => f.toggleAttribute('data-active', i === idx));
+      if (dataEl) dataEl.textContent = frames[idx]?.dataset.date ?? '';
+      if (fitaEl) fitaEl.textContent = frames[idx]?.dataset.label ?? '';
+    };
+    range.addEventListener('input', () => render(Number(range.value)));
+    const go = (i: number): void => render(Number(frames[i]?.dataset.day ?? 1));
+    btns.forEach((b, i) => b.addEventListener('click', () => go(i)));
+    frames.forEach((f, i) => f.addEventListener('click', () => go(i)));
+    render(1);
+  }
+</script>

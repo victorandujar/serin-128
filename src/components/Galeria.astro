@@ -1,0 +1,72 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { fotos } from '../data/galeria';
+import { ui, tr, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const filtres = [
+  { id: 'tot', label: tr(lang, ui.galeria.all) },
+  { id: 'banys', label: tr(lang, ui.galeria.banys) },
+  { id: 'cuines', label: tr(lang, ui.galeria.cuines) },
+  { id: 'portes', label: tr(lang, ui.galeria.portes) },
+];
+const items = await Promise.all(fotos.map(async (f) => ({ ...f, big: (await getImage({ src: f.img, width: 1000, format: 'webp' })).src })));
+---
+<section id="treballs" aria-labelledby="treballs-t">
+  <div class="mx-auto max-w-[90rem] px-4 py-20 sm:px-8 sm:py-24">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <h2 id="treballs-t" class="rotul text-[clamp(2.5rem,5vw,4rem)]" data-reveal>{lang === 'ca' ? 'Més feina' : 'Más trabajos'}</h2>
+        <p class="mt-3 max-w-md text-tinta-2" data-reveal style="--i:1">{lang === 'ca' ? 'Fotos de banys, cuines i portes que hem fet. Toca una foto per veure-la gran.' : 'Fotos de baños, cocinas y puertas que hemos hecho. Toca una foto para verla grande.'}</p>
+      </div>
+      <div role="group" aria-label={tr(lang, ui.galeria.eyebrow)} class="flex flex-wrap gap-6 border-b-2 border-ratlla" data-reveal style="--i:2">
+        {filtres.map((f, i) => (
+          <button type="button" data-filtre={f.id} aria-pressed={i === 0 ? 'true' : 'false'} class="-mb-[2px] border-b-2 border-transparent pb-3 pt-2 text-lg font-semibold text-tinta-2 transition-colors hover:text-tinta aria-pressed:border-esmalt aria-pressed:text-esmalt">{f.label}</button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Fotos impreses -->
+    <ul class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5">
+      {items.map((f, i) => (
+        <li data-tipus={f.tipus} data-reveal style={`--i:${i % 5}`}>
+          <button type="button" class="group relative block w-full bg-white p-2 pb-8 text-left shadow-[0_1px_0_#e3dccd,0_14px_24px_-18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:-translate-y-1" data-open={f.big} data-alt={tr(lang, f.alt)} aria-label={`${tr(lang, ui.galeria.open)}: ${tr(lang, f.alt)}`}>
+            <Image src={f.img} alt="" widths={[300, 520]} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw" class="aspect-square w-full object-cover" loading="lazy" />
+            <span class="absolute bottom-2 left-3 text-xs text-tinta-2" aria-hidden="true">{f.tipus === 'banys' ? (lang === 'ca' ? 'Bany' : 'Baño') : f.tipus === 'cuines' ? (lang === 'ca' ? 'Cuina' : 'Cocina') : (lang === 'ca' ? 'Porta' : 'Puerta')}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <dialog class="m-auto max-h-[92vh] max-w-[min(92vw,60rem)] bg-transparent p-0 backdrop:bg-tinta/90" data-lightbox aria-label={tr(lang, ui.galeria.open)}>
+    <figure class="relative">
+      <img src="" alt="" class="max-h-[84vh] w-auto rounded-2xl" data-lb-img />
+      <figcaption class="mt-3 text-center font-semibold text-white" data-lb-cap></figcaption>
+      <button type="button" class="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-paper text-2xl text-tinta" data-lb-close aria-label={tr(lang, ui.galeria.close)}>×</button>
+    </figure>
+  </dialog>
+</section>
+
+<script>
+  for (const section of document.querySelectorAll<HTMLElement>('#treballs')) {
+    const btns = [...section.querySelectorAll<HTMLButtonElement>('[data-filtre]')];
+    const items = [...section.querySelectorAll<HTMLElement>('[data-tipus]')];
+    btns.forEach((b) => b.addEventListener('click', () => {
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      items.forEach((it) => (it.hidden = b.dataset.filtre !== 'tot' && it.dataset.tipus !== b.dataset.filtre));
+    }));
+    const dlg = section.querySelector<HTMLDialogElement>('[data-lightbox]');
+    const img = section.querySelector<HTMLImageElement>('[data-lb-img]');
+    const cap = section.querySelector<HTMLElement>('[data-lb-cap]');
+    section.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((b) => b.addEventListener('click', () => {
+      if (!dlg || !img) return;
+      img.src = b.dataset.open ?? '';
+      img.alt = b.dataset.alt ?? '';
+      if (cap) cap.textContent = b.dataset.alt ?? '';
+      dlg.showModal();
+    }));
+    section.querySelector('[data-lb-close]')?.addEventListener('click', () => dlg?.close());
+    dlg?.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  }
+</script>
