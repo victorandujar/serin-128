@@ -1,0 +1,6 @@
+---
+import svg from '../assets/brand/serin.svg?raw';
+interface Props { class?: string }
+const { class: cls = '' } = Astro.props;
+---
+<span class:list={['inline-block [&>svg]:h-full [&>svg]:w-auto', cls]} set:html={svg.replace('<svg ', '<svg aria-hidden="true" focusable="false" ')} />
