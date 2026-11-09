@@ -1,0 +1,10 @@
+---
+import { business, telUrl, waUrl } from '../data/business';
+import { ui, tr, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<nav aria-label={lang === 'ca' ? 'Contacte ràpid' : 'Contacto rápido'} class="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 border-t border-ratlla bg-white md:hidden">
+  <a href={telUrl(business.phones[0].e164)} class="flex min-h-14 items-center justify-center font-semibold text-esmalt">{tr(lang, ui.mobile.call)}</a>
+  <a href={waUrl(lang === 'ca' ? 'Hola, voldria un pressupost.' : 'Hola, quería un presupuesto.')} rel="noopener" target="_blank" class="flex min-h-14 items-center justify-center bg-esmalt font-semibold text-white">WhatsApp</a>
+</nav>

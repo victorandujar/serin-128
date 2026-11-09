@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import { business, telUrl } from '../data/business';
+import { p, type Lang } from '../i18n/ui';
+import bany from '../assets/obres/bany-2017-a.jpg';
+import cuina from '../assets/obres/cuina-fusta.jpg';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section aria-labelledby="hero-t" class="relative overflow-hidden">
+  <div class="mx-auto grid max-w-[90rem] gap-10 px-4 pb-24 pt-10 sm:px-8 md:pb-16 lg:grid-cols-12 lg:gap-12 lg:pt-16">
+    <!-- Columna esquerra: la "façana" -->
+    <div class="lg:col-span-6 lg:pt-6">
+      <div class="flex items-start gap-5 sm:gap-7" data-reveal>
+        <!-- Placa esmaltada del número del carrer -->
+        <div class="placa grid h-28 w-36 shrink-0 place-items-center sm:h-36 sm:w-48" role="img" aria-label={p(lang, 'Número 128', 'Número 128')}>
+          <span class="rotul text-[4.2rem] leading-none sm:text-[5.6rem]" aria-hidden="true">128</span>
+        </div>
+        <p class="pt-2 text-[0.95rem] leading-snug text-tinta-2 sm:pt-4 sm:text-base">
+          {p(lang, 'Carrer de Rosselló, 128', 'Calle Rosselló, 128')}<br />
+          {p(lang, 'cantonada amb Benviure', 'esquina con Benviure')}<br />
+          <strong class="font-semibold text-tinta">Sant Boi de Llobregat</strong>
+        </p>
+      </div>
+
+      <h1 id="hero-t" class="rotul mt-10 text-[clamp(2.9rem,7.2vw,6.4rem)]" data-reveal style="--i:1">
+        {p(lang, 'Banys, cuines i instal·lacions a Sant Boi.', 'Baños, cocinas e instalaciones en Sant Boi.')}
+      </h1>
+      <p class="mt-6 max-w-xl text-lg text-tinta-2" data-reveal style="--i:2">
+        {p(lang,
+          'Som una empresa petita de reformes del Baix Llobregat. Treballem amb equip propi d’unes deu persones: paleteria, lampisteria, ferralleria, pintura, guix i pladur.',
+          'Somos una empresa pequeña de reformas del Baix Llobregat. Trabajamos con equipo propio de unas diez personas: albañilería, fontanería, herrería, pintura, yeso y pladur.')}
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-3" data-reveal style="--i:3">
+        <a href="#pressupost" class="btn btn-esmalt">{p(lang, 'Demanar pressupost', 'Pedir presupuesto')}</a>
+        <a href={telUrl(business.phones[0].e164)} class="btn btn-line tabular-nums">{business.phones[0].display}</a>
+      </div>
+    </div>
+
+    <!-- Columna dreta: aparador amb fotos reals i cartell d'horari -->
+    <div class="relative lg:col-span-6">
+      <figure class="relative overflow-hidden rounded-xl bg-paper-2">
+        <span class="estampa absolute right-4 top-4 z-10 text-base sm:text-lg" aria-hidden="true">'17 4 3</span>
+        <Image src={bany} alt={p(lang, 'Bany reformat amb plat de dutxa a terra, moble doble i tovalloler', 'Baño reformado con plato de ducha a ras de suelo, mueble doble y toallero')} widths={[480, 720, 1000]} sizes="(min-width: 1024px) 46vw, 100vw" class="aspect-[16/10] w-full object-cover" loading="eager" fetchpriority="high" />
+        <figcaption class="px-4 py-3 text-sm text-tinta-2">{p(lang, 'Un bany nostre, abril de 2017', 'Un baño nuestro, abril de 2017')}</figcaption>
+      </figure>
+      <div class="mt-4 grid grid-cols-5 gap-4">
+        <figure class="col-span-2 overflow-hidden rounded-xl bg-paper-2">
+          <Image src={cuina} alt={p(lang, 'Cuina amb mobles de fusta i taulell de granit', 'Cocina con muebles de madera y encimera de granito')} widths={[320, 480]} sizes="18vw" class="aspect-square w-full object-cover" loading="lazy" />
+        </figure>
+        <!-- Cartell d'horari, com el de la porta -->
+        <div class="col-span-3 flex flex-col justify-between rounded-xl border-2 border-tinta bg-[#fffdf8] p-4 sm:p-5">
+          <p class="flex items-center gap-2 font-bold uppercase tracking-wider text-esmalt"><span class="inline-block h-2.5 w-2.5 rounded-full bg-[#2e9e5b]" aria-hidden="true"></span>{p(lang, 'Horari', 'Horario')}</p>
+          <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[0.95rem]">
+            <dt class="text-tinta-2">{p(lang, 'Dl–Dv', 'L–V')}</dt><dd class="font-semibold tabular-nums">9:00 – 13:00</dd>
+            <dt></dt><dd class="font-semibold tabular-nums">17:00 – 20:00</dd>
+            <dt class="text-tinta-2">{p(lang, 'Ds–Dg', 'S–D')}</dt><dd class="text-tinta-2">{p(lang, 'tancat', 'cerrado')}</dd>
+          </dl>
+          <p class="mt-3 text-sm text-tinta-2">{business.phones.map((ph, i) => <>{i > 0 && ' · '}<a href={telUrl(ph.e164)} class="font-semibold text-tinta tabular-nums hover:underline">{ph.display}</a></>)}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
